@@ -1,0 +1,13 @@
+{
+  "test":{
+    "PORT":3000,
+    "MONGODB_URI":"mongodb://localhost:27017/TodoAppTest",
+    "JTWSecret":"kappa123"
+  },
+  "dev":{
+    "PORT":3000,
+    "MONGODB_URI":"mongodb://localhost:27017/TodoApp",
+    "JTWSecret":"kappa123"
+
+  }
+}

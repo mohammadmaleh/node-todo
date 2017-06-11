@@ -1,3 +1,4 @@
 node_modules/
 .idea/
 playground/
+server/config/config.json

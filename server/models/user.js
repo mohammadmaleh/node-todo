@@ -44,7 +44,7 @@ UserSchema.methods.toJSON = function(){ // overwriting an existing function to d
 UserSchema.methods.generateAuthToken =function () { // we used old function because arrow function doesn't bind this
     let user = this ;
     let access = 'auth';
-    let token = jwt.sign({_id : user._id.toHexString(),access:access},'kappa123').toString();
+    let token = jwt.sign({_id : user._id.toHexString(),access:access},env.JTWSecret).toString();/* secert code inside config.json*/
     user.tokens.push({access:access,token:token})
     return user.save().then(()=>{
         return token
@@ -55,11 +55,10 @@ UserSchema.statics.findByToken= function (token) {
     let User = this;
     let decoded;
     try{
-       decoded= jwt.verify(token,'kappa123')
+       decoded= jwt.verify(token,process.env.JTWSecret)/* secert code inside config.json*/
     } catch (e){
-        return new Promise((resolve,reject)=>{ // return a promise that alwais rejects
-            reject('')
-        })
+        return new Promise.reject() // return a promise that alwais rejects
+
     }
     return User.findOne({
         _id: decoded._id,
@@ -87,6 +86,7 @@ UserSchema.pre('save',function (next) {
     }
 
 })
+
 UserSchema.statics.findByCredentials = function (email,password) {
     var User = this ;
     return User.findOne({email}).then((user)=>{
@@ -106,5 +106,16 @@ UserSchema.statics.findByCredentials = function (email,password) {
         })
     })
 }
+UserSchema.methods.removeToken  =function (token) {
+    var user = this;
+    return user.update({
+        $pull: {
+            tokens:{
+                 token : token
+            }
+        }
+    })
+}
+
 var User = mongoose.model('User', UserSchema )
 module.exports = {User}
