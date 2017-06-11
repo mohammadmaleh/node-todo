@@ -44,7 +44,7 @@ UserSchema.methods.toJSON = function(){ // overwriting an existing function to d
 UserSchema.methods.generateAuthToken =function () { // we used old function because arrow function doesn't bind this
     let user = this ;
     let access = 'auth';
-    let token = jwt.sign({_id : user._id.toHexString(),access:access},env.JTWSecret).toString();/* secert code inside config.json*/
+    let token = jwt.sign({_id : user._id.toHexString(),access:access},process.env.JTWSecret).toString();/* secert code inside config.json*/
     user.tokens.push({access:access,token:token})
     return user.save().then(()=>{
         return token
