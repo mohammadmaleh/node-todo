@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const validator = require('validator')
 const jwt = require('jsonwebtoken')
 const _ = require('lodash')
+const bcrypt = require('bcryptjs')
 // to add methods to our model we can do directly so we use schema then add the method then add the whole thing to the model
 let UserSchema =  new mongoose.Schema({
         email:{
@@ -67,5 +68,24 @@ UserSchema.statics.findByToken= function (token) {
 
     })
 };
+UserSchema.pre('save',function (next) {
+    let user = this ;
+    if(user.isModified('password')){
+        bcrypt.genSalt(10,(err, salt)=>{
+            console.log('salt',salt)
+            bcrypt.hash(user.password,salt,(err, hash)=>{
+                console.log('hash',hash)
+                user.password = hash;
+                console.log('password',user.password)
+
+                next();
+            })
+        });
+    }
+    else{
+        next();
+    }
+
+})
 var User = mongoose.model('User', UserSchema )
 module.exports = {User}
